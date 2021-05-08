@@ -2,9 +2,10 @@
 #include <vector>
 #include <typeinfo>
 #include <typeindex>
-#include "Utils.hpp"
-#include "EntityManager.hpp"
-#include "ComponentManager.hpp"
+#include "Utils/Utils.hpp"
+#include "Entity/Manager.hpp"
+#include "Component/Manager.hpp"
+#include "Entity/Position.hpp"
 using namespace std;
 
 // Stackoverflow solution

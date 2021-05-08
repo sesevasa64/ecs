@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(ecs)
+project(oopGL)
 
-file(GLOB SRC include/*.hpp src/*.cpp)
-include_directories(include)
-link_directories(include)
+file(GLOB SRC Sources/main.cpp Sources/*/*.hpp Sources/*/*.cpp)
+include_directories(Sources)
+link_directories(Sources)
 
 add_executable(${PROJECT_NAME} ${SRC})

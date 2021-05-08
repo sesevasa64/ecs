@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "Component.hpp"
+#include "Component/Component.hpp"
 
 using ComponentIt = Map<EntityID, RefComponent>::iterator;
 using ComponentMap = Map<TypeID, Map<EntityID, RefComponent>>;

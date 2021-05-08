@@ -1,12 +1,25 @@
 #pragma once
 #include <memory>
 #include <unordered_map>
-#include "Entity.hpp"
-#include "Utils.hpp"
-
-using EntityMap = Map<TypeID, Map<EntityID, RefEntity>>;
-using EntityIt = Map<EntityID, RefEntity>::iterator;
+#include "Entity/Entity.hpp"
+#include "Utils/Utils.hpp"
+#include <iostream>
+using EntityMap = Map<TypeID, Map<EntityID, RefWeakEntity>>;
+using EntityIt = Map<EntityID, RefWeakEntity>::iterator;
 using BaseIt = EntityMap::iterator;
+
+template<typename T>
+struct Deleter {
+    Deleter(EntityMap& map) : map(map) {}
+    void operator()(T *p) {
+        TypeID typeID = TypeInfo::get<T>();
+        std::cout << p->ID() << std::endl;
+        map[typeID].erase(p->ID());
+        delete p;
+    }
+private:
+    EntityMap& map;
+};
 
 class EntityManager {
 public:
@@ -24,10 +37,10 @@ public:
             return iter;
         }
         RefDevidedEntity<T> operator->() {
-            return std::static_pointer_cast<T>(it->second);
+            return std::static_pointer_cast<T>(it->second.lock());
         }
         RefDevidedEntity<T> operator*() {
-            return std::static_pointer_cast<T>(it->second);
+            return std::static_pointer_cast<T>(it->second.lock());
         }
         bool operator==(const Iterator& other) {
             return it == other.it;
@@ -41,14 +54,16 @@ public:
     template<typename T, typename... ARGS>
     RefDevidedEntity<T> createEntity(ARGS&&... args) {
         TypeID typeID = TypeInfo::get<T>();
-        RefDevidedEntity<T> entity = std::make_shared<T>(id, std::forward<ARGS>(args)...);
+        static Deleter<T> deleter(map);
+        //RefDevidedEntity<T> entity = std::make_shared<T>(id, std::forward<ARGS>(args)...);
+        auto entity = std::shared_ptr<T>(new T(id, std::forward<ARGS>(args)...), deleter);
         map[typeID][id++] = entity;
         return entity;
     }
     template<typename T>
     RefDevidedEntity<T> getEntity(EntityID id) {
         TypeID typeID = TypeInfo::get<T>();
-        return std::static_pointer_cast<T>(map[typeID][id]);
+        return std::static_pointer_cast<T>(map[typeID][id].lock());
     }
     template<typename T = Entity>
     Iterator<T> begin() {
@@ -72,6 +87,9 @@ public:
     Iterator(BaseIt baseIt, BaseIt endIt) : baseIt(baseIt), endIt(endIt) {
         if (baseIt != endIt) {
             it = baseIt->second.begin();
+            while (it == baseIt->second.end()) {
+                it = (++baseIt)->second.begin();
+            }
         }
     }
     Iterator& operator++() {
@@ -87,11 +105,14 @@ public:
         ++(*this);
         return iter;
     }
-    RefDevidedEntity<Entity> operator->() {
-        return it->second;
+    RefEntity operator->() {
+        while (it == baseIt->second.end()) {
+            it = (++baseIt)->second.begin();
+        }
+        return it->second.lock();
     }
-    RefDevidedEntity<Entity> operator*() {
-        return it->second;
+    RefEntity operator*() {
+        return it->second.lock();
     }
     bool operator==(const Iterator& other) {
         return baseIt == other.baseIt;
