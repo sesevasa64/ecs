@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <unordered_map>
 
 using TypeID = uint32_t;
 using EntityID = TypeID;
@@ -15,3 +16,6 @@ public:
         return i;
     }
 };
+
+template<typename T, typename U>
+using Map = std::unordered_map<T, U>;

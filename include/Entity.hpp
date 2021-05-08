@@ -12,6 +12,9 @@ public:
     Entity(EntityID id) : id(id) {}
     EntityID ID() { return id; }
 protected:
+    template<typename T>
+    void createComponent();
+private:
     virtual void dummy() {}
     EntityID id;
 };
@@ -19,5 +22,13 @@ protected:
 class Cat : public Entity {
 public:
     Cat(EntityID id) : Entity(id) {}
-    void meow() { std::cout << "ID: " << id << std::endl; }
+    void meow() { std::cout << "ID: " << ID() << std::endl; }
+};
+class Dog : public Entity {
+public:
+    Dog(EntityID id) : Entity(id) {}
+};
+class Floppa : public Entity {
+public:
+    Floppa(EntityID id) : Entity(id) {} 
 };

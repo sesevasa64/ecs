@@ -42,6 +42,23 @@ int main() {
     auto cat_2 = manager.getEntity<Cat>(cat->ID());
     cat_2->meow();
 
+    cout << "------" << endl;
+    for (auto it = manager.begin<Cat>(); it != manager.end<Cat>(); ++it) {
+        cout << "Cat: " << it->ID() << endl;
+    }
+    cout << "------" << endl;
+
+    manager.createEntity<Dog>();
+    manager.createEntity<Floppa>();
+    manager.createEntity<Dog>();
+
+    auto begin = manager.begin();
+    auto end = manager.end();
+
+    for (auto it = manager.begin(); it != manager.end(); ++it) {
+        cout << "Entity: " << it->ID() << endl; 
+    }
+
     ComponentManager cManager;
     auto position = cManager.createComponent<Position>(cat->ID(), 1, 2, 3);
     position->test();
