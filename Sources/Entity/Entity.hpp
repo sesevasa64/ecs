@@ -1,44 +1,37 @@
 #pragma once
 #include <iostream>
-#include <memory>
+#include "Component/Manager.hpp"
 #include "Utils/Utils.hpp"
-
-class Entity;
-using RefEntity = std::shared_ptr<Entity>;
-template<typename T>
-using RefDevidedEntity = std::shared_ptr<T>;
-using RefWeakEntity = std::weak_ptr<Entity>;
-template<typename T>
-using RefDevidedWeakEntity = std::weak_ptr<T>;
 
 class Entity {
 public:
-    Entity(EntityID id) : id(id) {}
+    Entity(EntityID id, ComponentManager& manager);
     EntityID ID() { return id; }
-    virtual ~Entity() {}
 protected:
-    template<typename T>
-    void createComponent();
+    template<typename T, typename... ARGS>
+    RefDevidedComponent<T> createComponent(ARGS&&... args) {
+        return manager.createComponent<T>(id, std::forward<ARGS>(args)...);
+    }
 private:
-    virtual void dummy() {}
+    ComponentManager& manager;
     EntityID id;
 };
 
 class Cat : public Entity {
 public:
-    Cat(EntityID id) : Entity(id) {}
+    Cat(EntityID id, ComponentManager& manager) : Entity(id, manager) {}
     ~Cat() { std::cout << "Cat: " << ID() << ", destructor" << std::endl; }
     void meow();
 };
 
 class Dog : public Entity {
 public:
-    Dog(EntityID id) : Entity(id) {}
+    Dog(EntityID id, ComponentManager& manager) : Entity(id, manager) {}
     ~Dog() { std::cout << "Dog: " << ID() << ", destructor" << std::endl; }
 };
 
 class Floppa : public Entity {
 public:
-    Floppa(EntityID id) : Entity(id) {}
+    Floppa(EntityID id, ComponentManager& manager) : Entity(id, manager) {}
     ~Floppa() { std::cout << "Floppa: " << ID() << ", destructor" << std::endl; } 
 };

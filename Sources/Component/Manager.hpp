@@ -22,10 +22,10 @@ public:
             return iter;
         }
         RefDevidedEntity<T> operator->() {
-            return std::static_pointer_cast<T>(it->second);
+            return std::static_pointer_cast<T>(it->second.lock());
         }
         RefDevidedEntity<T> operator*() {
-            return std::static_pointer_cast<T>(it->second);
+            return std::static_pointer_cast<T>(it->second.lock());
         }
         bool operator==(const Iterator& other) {
             return it == other.it;
@@ -41,7 +41,7 @@ public:
         Deleter(ComponentMap& map) : map(map) {}
         void operator()(T *p) {
             static TypeID typeID = TypeInfo::get<T>();
-            map[typeID].erase(p->ID());
+            map[typeID].erase(p->ownerID());
             delete p;
         }
     private:
@@ -60,12 +60,12 @@ public:
         static TypeID typeID = TypeInfo::get<T>();
         return std::static_pointer_cast<T>(map[typeID][id].lock());
     }
-    template<typename T>
+    template<typename T = Component>
     Iterator<T> begin() {
         static TypeID typeID = TypeInfo::get<T>();
         return Iterator<T>(map[typeID].begin());
     }
-    template<typename T>
+    template<typename T = Component>
     Iterator<T>& end() {
         static TypeID typeID = TypeInfo::get<T>();
         static Iterator<T> iter(map[typeID].end());
@@ -117,12 +117,13 @@ private:
     ComponentMapIt baseIt, endIt;
     ComponentIt it;
 };
+
 template<>
-ComponentManager::Iterator<Component> ComponentManager::begin() {
+inline ComponentManager::Iterator<Component> ComponentManager::begin() {
     return Iterator<Component>(map.begin(), map.end());
 }
 template<>
-ComponentManager::Iterator<Component>& ComponentManager::end() {
+inline ComponentManager::Iterator<Component>& ComponentManager::end() {
     static Iterator<Component> iter(map.end(), map.end());
     return iter;
 }

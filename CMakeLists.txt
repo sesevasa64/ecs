@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(oopGL)
+project(ecs)
 
 file(GLOB SRC Sources/main.cpp Sources/*/*.hpp Sources/*/*.cpp)
 include_directories(Sources)

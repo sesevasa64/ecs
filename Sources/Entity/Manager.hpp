@@ -1,9 +1,6 @@
 #pragma once
-#include <memory>
-#include <unordered_map>
 #include "Entity/Entity.hpp"
 #include "Utils/Utils.hpp"
-#include <iostream>
 
 using EntityMap = Map<TypeID, Map<EntityID, RefWeakEntity>>;
 using EntityIt = Map<EntityID, RefWeakEntity>::iterator;
@@ -11,6 +8,7 @@ using EntityMapIt = EntityMap::iterator;
 
 class EntityManager {
 public:
+    EntityManager(ComponentManager& manager) : manager(manager) {}
     template<typename T>
     class Iterator {
     public:
@@ -54,7 +52,7 @@ public:
     RefDevidedEntity<T> createEntity(ARGS&&... args) {
         static TypeID typeID = TypeInfo::get<T>();
         static Deleter<T> deleter(map);
-        auto entity = std::shared_ptr<T>(new T(id, std::forward<ARGS>(args)...), deleter);
+        auto entity = std::shared_ptr<T>(new T(id, manager, std::forward<ARGS>(args)...), deleter);
         map[typeID][id++] = entity;
         return entity;
     }
@@ -75,6 +73,7 @@ public:
         return iter;
     }
 private:
+    ComponentManager& manager;
     EntityMap map;
     EntityID id = 0;
 };
@@ -121,12 +120,13 @@ private:
     EntityMapIt baseIt, endIt;
     EntityIt it;
 };
+
 template<>
-EntityManager::Iterator<Entity> EntityManager::begin() {
+inline EntityManager::Iterator<Entity> EntityManager::begin() {
     return Iterator<Entity>(map.begin(), map.end());
 }
 template<>
-EntityManager::Iterator<Entity>& EntityManager::end() {
+inline EntityManager::Iterator<Entity>& EntityManager::end() {
     static Iterator<Entity> iter(map.end(), map.end());
     return iter;
 }

@@ -1,4 +1,4 @@
-#include "Position.hpp"
+#include "Component/Position.hpp"
 #include <iostream>
 using namespace std;
 

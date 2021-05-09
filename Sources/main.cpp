@@ -5,7 +5,8 @@
 #include "Utils/Utils.hpp"
 #include "Entity/Manager.hpp"
 #include "Component/Manager.hpp"
-#include "Entity/Position.hpp"
+#include "Component/Position.hpp"
+#include "Systems/Phycics.hpp"
 using namespace std;
 
 // Stackoverflow solution
@@ -35,7 +36,9 @@ int main() {
     v.erase(v.begin() + 1);
     cout << v[1] << endl;
     */
-    EntityManager manager;
+    ComponentManager cManager;
+    EntityManager manager(cManager);
+    
     auto cat = manager.createEntity<Cat>();
     cat->meow();
     auto cat2 = manager.createEntity<Cat>();
@@ -56,8 +59,12 @@ int main() {
     for (auto it = manager.begin(); it != manager.end(); ++it) {
         cout << "Entity: " << it->ID() << endl; 
     }
+    auto c1 = cManager.createComponent<Position>(0, 1 ,2 ,3);
+    auto c2 = cManager.createComponent<Position>(1, 4, 5, 6);
+    for (auto it = cManager.begin(); it != cManager.end(); ++it) {
+        cout << "Entity owner: " << it->ownerID() << endl; 
+    }
 
-    ComponentManager cManager;
     auto position = cManager.createComponent<Position>(cat->ID(), 1, 2, 3);
     position->test();
     auto position_2 = cManager.getComponent<Position>(cat->ID());
