@@ -3,6 +3,7 @@
 #include <typeinfo>
 #include <typeindex>
 #include "Utils/Utils.hpp"
+#include "Entity/Animals.hpp"
 #include "Entity/Manager.hpp"
 #include "Component/Manager.hpp"
 #include "Component/Position.hpp"
