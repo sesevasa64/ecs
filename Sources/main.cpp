@@ -53,12 +53,16 @@ int main() {
     manager.createEntity<Floppa>();
     manager.createEntity<Dog>();
 
-    auto begin = manager.begin();
-    auto end = manager.end();
+    //auto begin = manager.begin();
+    //auto end = manager.end();
 
     for (auto it = manager.begin(); it != manager.end(); ++it) {
         cout << "Entity: " << it->ID() << endl; 
     }
+
+    cout << "------" << endl;
+    manager.test();
+    cout << "------" << endl;
 
     ComponentManager cManager;
     auto position = cManager.createComponent<Position>(cat->ID(), 1, 2, 3);

@@ -4,6 +4,7 @@
 #include "Entity/Entity.hpp"
 #include "Utils/Utils.hpp"
 #include <iostream>
+
 using EntityMap = Map<TypeID, Map<EntityID, RefWeakEntity>>;
 using EntityIt = Map<EntityID, RefWeakEntity>::iterator;
 using BaseIt = EntityMap::iterator;
@@ -55,7 +56,6 @@ public:
     RefDevidedEntity<T> createEntity(ARGS&&... args) {
         TypeID typeID = TypeInfo::get<T>();
         static Deleter<T> deleter(map);
-        //RefDevidedEntity<T> entity = std::make_shared<T>(id, std::forward<ARGS>(args)...);
         auto entity = std::shared_ptr<T>(new T(id, std::forward<ARGS>(args)...), deleter);
         map[typeID][id++] = entity;
         return entity;
@@ -64,6 +64,13 @@ public:
     RefDevidedEntity<T> getEntity(EntityID id) {
         TypeID typeID = TypeInfo::get<T>();
         return std::static_pointer_cast<T>(map[typeID][id].lock());
+    }
+    void test() {
+        for (auto &submap : map) {
+            for (auto &pair : submap.second) {
+                std::cout << "Entity: " << pair.first << std::endl;
+            }
+        }
     }
     template<typename T = Entity>
     Iterator<T> begin() {
@@ -84,19 +91,21 @@ private:
 template<>
 class EntityManager::Iterator<Entity> {
 public:
-    Iterator(BaseIt baseIt, BaseIt endIt) : baseIt(baseIt), endIt(endIt) {
+    Iterator(BaseIt start, BaseIt end) : baseIt(start), endIt(end) {
         if (baseIt != endIt) {
             it = baseIt->second.begin();
             while (it == baseIt->second.end()) {
-                it = (++baseIt)->second.begin();
+                if (++baseIt == endIt)
+                    return;
+                it = baseIt->second.begin();
             }
         }
     }
     Iterator& operator++() {
-        if (++it == baseIt->second.end()) {
-            if (++baseIt != endIt) { 
-                it = baseIt->second.begin();
-            }
+        while (++it == baseIt->second.end()) {
+            if (++baseIt == endIt)
+                return *this;
+            it = baseIt->second.begin();
         }
         return *this;
     }
@@ -106,9 +115,6 @@ public:
         return iter;
     }
     RefEntity operator->() {
-        while (it == baseIt->second.end()) {
-            it = (++baseIt)->second.begin();
-        }
         return it->second.lock();
     }
     RefEntity operator*() {
