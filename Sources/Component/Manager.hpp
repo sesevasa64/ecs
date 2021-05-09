@@ -51,9 +51,10 @@ public:
     RefDevidedComponent<T> createComponent(EntityID id, ARGS&&... args) {
         static TypeID typeID = TypeInfo::get<T>();
         static Deleter<T> deleter(map);
-        auto entity = std::shared_ptr<T>(new T(id, std::forward<ARGS>(args)...), deleter);
-        map[typeID][id] = entity;
-        return entity;
+        Ref<T> component(new T(std::forward<ARGS>(args)...), deleter);
+        component->setOwnerID(id);
+        map[typeID][id] = component;
+        return component;
     }
     template<typename T>
     RefDevidedComponent<T> getComponent(EntityID id) {

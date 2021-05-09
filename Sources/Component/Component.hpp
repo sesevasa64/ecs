@@ -1,11 +1,13 @@
 #pragma once
 #include "Utils/Utils.hpp"
 
+class ComponentManager;
+
 class Component {
 public:
-    Component(EntityID ownerID) : id(ownerID) {}
     EntityID ownerID() { return id; }
+    friend class ComponentManager;
 private:
-    virtual void dummy() {}
+    void setOwnerID(EntityID ownerID) { id = ownerID; }
     EntityID id;
 };

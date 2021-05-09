@@ -52,7 +52,10 @@ public:
     RefDevidedEntity<T> createEntity(ARGS&&... args) {
         static TypeID typeID = TypeInfo::get<T>();
         static Deleter<T> deleter(map);
-        auto entity = std::shared_ptr<T>(new T(id, manager, std::forward<ARGS>(args)...), deleter);
+        Ref<T> entity(new T(std::forward<ARGS>(args)...), deleter);
+        entity->setComponentManager(&manager);
+        entity->setID(id);
+        entity->Start();
         map[typeID][id++] = entity;
         return entity;
     }

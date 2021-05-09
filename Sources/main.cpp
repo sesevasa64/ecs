@@ -3,11 +3,12 @@
 #include <typeinfo>
 #include <typeindex>
 #include "Utils/Utils.hpp"
-#include "Entity/Animals.hpp"
 #include "Entity/Manager.hpp"
 #include "Component/Manager.hpp"
-#include "Component/Position.hpp"
 #include "Systems/Phycics.hpp"
+
+#include "Entity/Animals.hpp"
+#include "Component/Position.hpp"
 using namespace std;
 
 // Stackoverflow solution
@@ -60,8 +61,6 @@ int main() {
     for (auto it = manager.begin(); it != manager.end(); ++it) {
         cout << "Entity: " << it->ID() << endl; 
     }
-    auto c1 = cManager.createComponent<Position>(0, 1 ,2 ,3);
-    auto c2 = cManager.createComponent<Position>(1, 4, 5, 6);
     for (auto it = cManager.begin(); it != cManager.end(); ++it) {
         cout << "Entity owner: " << it->ownerID() << endl; 
     }

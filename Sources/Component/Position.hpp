@@ -3,7 +3,7 @@
 
 class Position : public Component {
 public:
-    Position(EntityID ownerID, double x, double y, double z);
+    Position(double x, double y, double z);
     void test();
 private:
     double x, y, z;

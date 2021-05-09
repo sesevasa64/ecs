@@ -36,3 +36,5 @@ using RefDevidedComponent = std::shared_ptr<T>;
 using RefWeakComponent = std::weak_ptr<Component>;
 template<typename T>
 using RefDevidedWeakComponent = std::weak_ptr<T>;
+template<typename T>
+using Ref = std::shared_ptr<T>;
