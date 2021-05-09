@@ -6,6 +6,9 @@ class Component;
 using RefComponent = std::shared_ptr<Component>; 
 template<typename T>
 using RefDevidedComponent = std::shared_ptr<T>;
+using RefWeakComponent = std::weak_ptr<Component>;
+template<typename T>
+using RefDevidedWeakComponent = std::weak_ptr<T>;
 
 class Component {
 public:

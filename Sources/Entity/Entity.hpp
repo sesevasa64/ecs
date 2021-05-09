@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <memory>
 #include "Utils/Utils.hpp"
 
@@ -9,7 +10,7 @@ using RefDevidedEntity = std::shared_ptr<T>;
 using RefWeakEntity = std::weak_ptr<Entity>;
 template<typename T>
 using RefDevidedWeakEntity = std::weak_ptr<T>;
-#include <iostream>
+
 class Entity {
 public:
     Entity(EntityID id) : id(id) {}

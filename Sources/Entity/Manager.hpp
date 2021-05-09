@@ -7,20 +7,7 @@
 
 using EntityMap = Map<TypeID, Map<EntityID, RefWeakEntity>>;
 using EntityIt = Map<EntityID, RefWeakEntity>::iterator;
-using BaseIt = EntityMap::iterator;
-
-template<typename T>
-struct Deleter {
-    Deleter(EntityMap& map) : map(map) {}
-    void operator()(T *p) {
-        TypeID typeID = TypeInfo::get<T>();
-        std::cout << p->ID() << std::endl;
-        map[typeID].erase(p->ID());
-        delete p;
-    }
-private:
-    EntityMap& map;
-};
+using EntityMapIt = EntityMap::iterator;
 
 class EntityManager {
 public:
@@ -52,9 +39,20 @@ public:
     private:
         EntityIt it;
     };
+    template<typename T>
+    struct Deleter {
+        Deleter(EntityMap& map) : map(map) {}
+        void operator()(T *p) {
+            TypeID typeID = TypeInfo::get<T>();
+            map[typeID].erase(p->ID());
+            delete p;
+        }
+    private:
+        EntityMap& map;
+    };
     template<typename T, typename... ARGS>
     RefDevidedEntity<T> createEntity(ARGS&&... args) {
-        TypeID typeID = TypeInfo::get<T>();
+        static TypeID typeID = TypeInfo::get<T>();
         static Deleter<T> deleter(map);
         auto entity = std::shared_ptr<T>(new T(id, std::forward<ARGS>(args)...), deleter);
         map[typeID][id++] = entity;
@@ -62,24 +60,17 @@ public:
     }
     template<typename T>
     RefDevidedEntity<T> getEntity(EntityID id) {
-        TypeID typeID = TypeInfo::get<T>();
+        static TypeID typeID = TypeInfo::get<T>();
         return std::static_pointer_cast<T>(map[typeID][id].lock());
-    }
-    void test() {
-        for (auto &submap : map) {
-            for (auto &pair : submap.second) {
-                std::cout << "Entity: " << pair.first << std::endl;
-            }
-        }
     }
     template<typename T = Entity>
     Iterator<T> begin() {
-        TypeID typeID = TypeInfo::get<T>();
+        static TypeID typeID = TypeInfo::get<T>();
         return Iterator<T>(map[typeID].begin());
     }
     template<typename T = Entity>
     Iterator<T>& end() {
-        TypeID typeID = TypeInfo::get<T>();
+        static TypeID typeID = TypeInfo::get<T>();
         static Iterator<T> iter(map[typeID].end());
         return iter;
     }
@@ -91,7 +82,7 @@ private:
 template<>
 class EntityManager::Iterator<Entity> {
 public:
-    Iterator(BaseIt start, BaseIt end) : baseIt(start), endIt(end) {
+    Iterator(EntityMapIt start, EntityMapIt end) : baseIt(start), endIt(end) {
         if (baseIt != endIt) {
             it = baseIt->second.begin();
             while (it == baseIt->second.end()) {
@@ -127,7 +118,7 @@ public:
         return baseIt != other.baseIt;
     }
 private:
-    BaseIt baseIt, endIt;
+    EntityMapIt baseIt, endIt;
     EntityIt it;
 };
 template<>
